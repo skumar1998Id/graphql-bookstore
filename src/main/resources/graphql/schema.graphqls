@@ -1,0 +1,239 @@
+# Scalar for DateTime (ZonedDateTime)
+scalar DateTime
+
+# User type
+type User {
+    id: ID!
+    name: String!
+    email: String!
+    password: String!
+    address: String
+    phoneNumber: String
+    orders: [Order!]
+    createdAt: DateTime
+    updatedAt: DateTime
+}
+
+# Book type
+type Book {
+    id: ID!
+    title: String!
+    author: String!
+    description: String
+    isbn: String!
+    price: Float!
+    stockQuantity: Int
+    category: Category
+    publisher: String!
+    publicationYear: Int!
+    language: String!
+    pageCount: Int
+    createdAt: DateTime
+    updatedAt: DateTime
+}
+
+# Category type
+type Category {
+    id: ID!
+    name: String!
+    description: String
+    books: [Book!]
+    createdAt: DateTime
+    updatedAt: DateTime
+}
+
+# Order type
+type Order {
+    id: ID!
+    user: User!
+    status: OrderStatus!
+    totalAmount: Float!
+    orderItems: [OrderItem!]!
+    shippingAddress: String
+    billingAddress: String
+    paymentMethod: String
+    trackingNumber: String
+    createdAt: DateTime
+    updatedAt: DateTime
+}
+
+# OrderItem type
+type OrderItem {
+    id: ID!
+    order: Order!
+    book: Book!
+    quantity: Int!
+    price: Float!
+    createdAt: DateTime
+    updatedAt: DateTime
+}
+
+# Enum for order status
+enum OrderStatus {
+    PENDING
+    PROCESSING
+    SHIPPED
+    DELIVERED
+    CANCELLED
+    REFUNDED
+}
+
+# Input type for creating a user
+input CreateUserInput {
+    name: String!
+    email: String!
+    password: String!
+    address: String
+    phoneNumber: String
+}
+
+# Input type for updating a user
+input UpdateUserInput {
+    id: ID!
+    name: String
+    email: String
+    password: String
+    address: String
+    phoneNumber: String
+}
+
+# Input type for creating a book
+input CreateBookInput {
+    title: String!
+    author: String!
+    description: String
+    isbn: String!
+    price: Float!
+    stockQuantity: Int!
+    categoryId: ID!
+    publisher: String!
+    publicationYear: Int!
+    language: String!
+    pageCount: Int
+}
+
+# Input type for updating a book
+input UpdateBookInput {
+    id: ID!
+    title: String
+    author: String
+    description: String
+    isbn: String
+    price: Float
+    stockQuantity: Int
+    categoryId: ID
+    publisher: String
+    publicationYear: Int
+    language: String
+    pageCount: Int
+}
+
+# Input type for creating a category
+input CreateCategoryInput {
+    name: String!
+    description: String
+}
+
+# Input type for updating a category
+input UpdateCategoryInput {
+    id: ID!
+    name: String
+    description: String
+}
+
+# Input type for creating an order
+input CreateOrderInput {
+    userId: ID!
+    orderItems: [OrderItemInput!]!
+    shippingAddress: String!
+    billingAddress: String
+    paymentMethod: String!
+}
+
+# Input type for order items in a new order
+input OrderItemInput {
+    bookId: ID!
+    quantity: Int!
+}
+
+# Input type for updating an order status
+input UpdateOrderStatusInput {
+    id: ID!
+    status: OrderStatus!
+}
+
+# Input type for updating order shipping information
+input UpdateOrderShippingInput {
+    id: ID!
+    shippingAddress: String
+    trackingNumber: String
+}
+
+# Input type for adding an item to an order
+input AddOrderItemInput {
+    orderId: ID!
+    bookId: ID!
+    quantity: Int!
+}
+
+# Input type for removing an item from an order
+input RemoveOrderItemInput {
+    orderId: ID!
+    orderItemId: ID!
+}
+
+# Root Query type
+type Query {
+    # User queries
+    users: [User!]!
+    user(id: ID!): User
+    userByEmail(email: String!): User
+    
+    # Book queries
+    books: [Book!]!
+    book(id: ID!): Book
+    bookByIsbn(isbn: String!): Book
+    booksByTitle(title: String!): [Book!]!
+    booksByAuthor(author: String!): [Book!]!
+    booksByCategory(categoryId: ID!): [Book!]!
+    
+    # Category queries
+    categories: [Category!]!
+    category(id: ID!): Category
+    categoryByName(name: String!): Category
+    
+    # Order queries
+    orders: [Order!]!
+    order(id: ID!): Order
+    ordersByUser(userId: ID!): [Order!]!
+    ordersByStatus(status: OrderStatus!): [Order!]!
+}
+
+# Root Mutation type
+type Mutation {
+    # User mutations
+    createUser(input: CreateUserInput!): User!
+    updateUser(input: UpdateUserInput!): User
+    deleteUser(id: ID!): Boolean!
+    authenticateUser(email: String!, password: String!): User
+    
+    # Book mutations
+    createBook(input: CreateBookInput!): Book!
+    updateBook(input: UpdateBookInput!): Book
+    deleteBook(id: ID!): Boolean!
+    updateBookStock(id: ID!, quantity: Int!): Book
+    
+    # Category mutations
+    createCategory(input: CreateCategoryInput!): Category!
+    updateCategory(input: UpdateCategoryInput!): Category
+    deleteCategory(id: ID!): Boolean!
+    
+    # Order mutations
+    createOrder(input: CreateOrderInput!): Order!
+    updateOrderStatus(input: UpdateOrderStatusInput!): Order
+    updateOrderShipping(input: UpdateOrderShippingInput!): Order
+    addOrderItem(input: AddOrderItemInput!): Order
+    removeOrderItem(input: RemoveOrderItemInput!): Order
+    cancelOrder(id: ID!): Order
+    deleteOrder(id: ID!): Boolean!
+}
